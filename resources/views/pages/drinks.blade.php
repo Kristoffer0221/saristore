@@ -23,7 +23,7 @@
 
     <!-- FILTER BAR -->
     <div class="flex flex-wrap justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-gray-800">Merienda Snacks</h2>
+        <h2 class="text-2xl font-bold text-gray-800">Drinks</h2>
         <div class="flex gap-2">
 
             @auth
@@ -34,6 +34,7 @@
                 </a>
             @endif
             @endauth
+            
             <button class="filter-btn px-4 py-1 bg-gray-200 text-sm rounded hover:bg-gray-300" data-sort="default">Default</button>
             <button class="filter-btn px-4 py-1 bg-gray-200 text-sm rounded hover:bg-gray-300" data-sort="low">Price Low</button>
             <button class="filter-btn px-4 py-1 bg-gray-200 text-sm rounded hover:bg-gray-300" data-sort="high">Price High</button>
@@ -83,9 +84,11 @@
                         </button>
                     </form>
                 @endauth
+
             </div>
         @endforeach
     </div>
+
     <div class="mt-8">
         {{ $products->links('vendor.pagination.tailwind') }}
     </div>

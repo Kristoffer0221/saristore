@@ -19,7 +19,6 @@
         @foreach($cart as $id => $item)
         <tr class="border-b hover:bg-yellow-50">
           <td class="p-4 flex items-center gap-4">
-            <!-- Image Display -->
             <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['name'] }}" class="w-16 h-16 object-cover rounded">
             <span>{{ $item['name'] }}</span>
           </td>
@@ -33,10 +32,10 @@
           </td>
           <td class="p-4">₱{{ number_format($item['price'] * $item['quantity'], 2) }}</td>
           <td class="p-4">
-            <form action="{{ route('cart.remove', $id) }}" method="POST">
+            <form action="{{ route('cart.remove', $id) }}" method="POST" onsubmit="return confirm('Remove this item?');">
               @csrf
               @method('DELETE')
-              <button type="submit" class="text-red-600 hover:underline">Remove</button>
+              <button type="submit" class="text-red-600 hover:underline">🗑️ Remove</button>
             </form>
           </td>
         </tr>
@@ -44,9 +43,17 @@
       </tbody>
     </table>
 
-    <div class="text-right mt-6 text-xl">
-      <strong>Total: ₱{{ number_format($total, 2) }}</strong>
+    <div class="text-right mt-1 text-gray-600 text-sm">
+        (Approx. ${{ number_format($total / 56, 2) }} USD)
     </div>
+
+    <div class="text-right mt-4">
+      <!-- PAYPAL CHECKOUT BUTTON USING GET LINK -->
+      <a href="{{ route('cart.checkout') }}" class="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition">
+        💳 Checkout with PayPal
+      </a>
+    </div>
+
   @else
     <p class="text-gray-600 text-center text-lg mt-10">Your cart is empty 😢</p>
   @endif

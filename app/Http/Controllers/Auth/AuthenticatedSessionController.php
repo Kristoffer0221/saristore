@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\Cart;
+
 
 class AuthenticatedSessionController extends Controller
 {
@@ -22,16 +24,43 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->authenticate();
-        $request->session()->regenerate();
-    
-        // Redirect based on is_admin boolean field
-        $url = $request->user()->is_admin ? route('products.create') : route('home');
-    
-        return redirect()->intended($url);
+    public function store(Request $request): RedirectResponse
+{
+    $request->validate([
+        'email' => ['required', 'string', 'email'],
+        'password' => ['required', 'string'],
+    ]);
+
+    if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        return back()->withErrors(['email' => 'Invalid credentials.']);
     }
+
+    $request->session()->regenerate();
+
+    $user = Auth::user();
+
+    // ✅ IF NOT ADMIN, LOAD CART FROM DB INTO SESSION
+    if (!$user->is_admin) {
+        $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
+
+        $cartSession = [];
+        foreach ($cartItems as $item) {
+            $cartSession[$item->product_id] = [
+                'name' => $item->product->name,
+                'price' => $item->product->price,
+                'image' => $item->product->image,
+                'quantity' => $item->quantity,
+            ];
+        }
+
+        session()->put('cart', $cartSession);
+    }
+    // ✅ REDIRECT BASED ON ROLE
+    return redirect()->intended($user->is_admin ? route('admin.products.index') : route('cart.index'));
+}
+
+
+    
     
 
     /**

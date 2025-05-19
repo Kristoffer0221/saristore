@@ -1,12 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
+
+
+
+<div class="mx-auto my-6 max-w-3xl max-h-120 p-6 bg-white rounded-lg shadow-md  ">
+
     <h2 class="text-3xl font-bold text-center mb-4">Add a New Product</h2>
 
+   {{-- ALERT MESSAGES --}}
     @if(session('success'))
-        <div class="mb-4 p-3 bg-green-200 text-green-800 rounded">
+        <div class="alert alert-success mb-4 p-3 bg-green-200 text-green-800 rounded" id="flash-message">
             {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger mb-4 p-3 bg-red-200 text-green-800 rounded" id="flash-message">
+            {{ session('error') }}
         </div>
     @endif
 
@@ -63,4 +74,17 @@
         </div>
     </form>
 </div>
+
+<script>
+    window.onload = function() {
+        // CHECK IF FLASH MESSAGE EXISTS
+        var flashMessage = document.getElementById('flash-message');
+        if (flashMessage) {
+            // SET A TIMER TO REMOVE THE MESSAGE AFTER 5 SECONDS (5000 MS)
+            setTimeout(function() {
+                flashMessage.style.display = 'none';
+            }, 3000); // YOU CAN CHANGE THE TIME (5000 MS = 5 SECONDS)
+        }
+    }
+</script>
 @endsection
