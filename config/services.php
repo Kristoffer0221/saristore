@@ -35,4 +35,28 @@ return [
         ],
     ],
 
+    'paypal' => [
+        'mode' => env('PAYPAL_MODE', 'sandbox'),
+
+        'sandbox' => [
+            'client_id' => env('PAYPAL_SANDBOX_CLIENT_ID'),
+            'client_secret' => env('PAYPAL_SANDBOX_CLIENT_SECRET'),
+            'app_id' => '', // Optional
+        ],
+
+        'live' => [
+            'client_id' => '',
+            'client_secret' => '',
+            'app_id' => '',
+        ],
+
+        'payment_action' => 'CAPTURE',
+        'currency' => env('PAYPAL_CURRENCY', 'PHP'),
+        'notify_url' => '', // Optional
+        'locale' => 'en_PH',
+        'validate_ssl' => true,
+    ],
+
+
+
 ];
