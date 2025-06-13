@@ -73,30 +73,15 @@ class CartController extends Controller
     // Remove product from the cart
     public function remove($id)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in.');
-        }
-
-        $userId = Auth::id();
-
-        // REMOVE FROM DATABASE CART
-        $cartItem = Cart::where('user_id', $userId)
-                        ->where('product_id', $id)
-                        ->first();
-
-        if ($cartItem) {
-            $cartItem->delete();
-        } else {
-        }
-
-        // REMOVE FROM SESSION CART
         $cart = session()->get('cart', []);
-        if (isset($cart[$id])) {
+        
+        if(isset($cart[$id])) {
             unset($cart[$id]);
             session()->put('cart', $cart);
+            return response()->json(['success' => true]);
         }
-
-        return redirect()->back()->with('success', '🗑️ Item removed from cart.');
+        
+        return response()->json(['error' => 'Item not found'], 404);
     }
 
     public function buyNow(Request $request, $id)

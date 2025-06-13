@@ -236,13 +236,27 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function removeItem(id) {
-    if (confirm('Remove this item?')) {
+    if (confirm('Are you sure you want to remove this item?')) {
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
         fetch(`/cart/${id}`, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'X-CSRF-TOKEN': token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
-        }).then(() => window.location.reload());
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to remove item');
+            }
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to remove item. Please try again.');
+        });
     }
 }
 </script>
