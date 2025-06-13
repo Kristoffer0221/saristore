@@ -81,7 +81,7 @@
 
     <!-- FILTER BAR -->
     <div class="flex flex-wrap justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-gray-800">Drinks</h2>
+        <h2 class="text-2xl font-bold text-gray-800">Household</h2>
         <div class="flex gap-2">
 
             @auth

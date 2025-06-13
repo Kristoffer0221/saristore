@@ -13,10 +13,72 @@ class ProductController extends Controller
 {
     public function showByCategory($category)
     {
+        if ($category === 'home') {
+            $query = Product::query();
+
+            // Apply category filter
+            if (request()->filled('category')) {
+                $query->where('category', request('category'));
+            }
+
+            // Apply price range filter
+            if (request()->filled('price_range')) {
+                $range = explode('-', request('price_range'));
+                if (count($range) === 2) {
+                    $query->whereBetween('price', [$range[0], $range[1]]);
+                } elseif (request('price_range') === '200+') {
+                    $query->where('price', '>=', 200);
+                }
+            }
+
+            // Apply sorting
+            switch (request('sort', 'latest')) {
+                case 'price_low':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'name':
+                    $query->orderBy('name', 'asc');
+                    break;
+                default:
+                    $query->latest();
+                    break;
+            }
+
+            $latestProducts = $query->paginate(10)->through(function ($product) {
+                $product->image_url = $product->getImageUrlAttribute();
+                return $product;
+            });
+
+            $featuredProducts = Product::inRandomOrder()
+                ->take(6)
+                ->get()
+                ->map(function ($product) {
+                    $product->image_url = $product->getImageUrlAttribute();
+                    return $product;
+                });
+
+            return view('pages.home', compact('latestProducts', 'featuredProducts'));
+        }
+
+        // Validate category
         $products = Product::where('category', $category)
             ->latest()
-            ->paginate(5); // Show 12 products per page
+            ->paginate(5)
+            ->through(function ($product) {
+                $product->image_url = $product->getImageUrlAttribute();
+                return $product;
+            });
+
         return view("pages.$category", compact('products'));
+    }
+
+    public function show(Product $product)
+    {
+        $product->image_url = $product->getImageUrlAttribute();
+        return view('products.show', compact('product'));
     }
 
     public function create()
@@ -37,6 +99,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:1',
+            'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category' => 'required|string|in:snacks,drinks,canned,noodles,toiletries,household,school,pasabuy',
         ]);
@@ -44,6 +107,7 @@ class ProductController extends Controller
         $product->name = $request->input('name');
         $product->price = $request->input('price');
         $product->category = $request->input('category');
+        $product->stock = $request->input('stock');
 
         if ($request->hasFile('image')) {
             // Delete old image
@@ -78,6 +142,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:1',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'stock' => 'required|integer|min:0',
             'category' => 'required|string|in:snacks,drinks,canned,noodles,toiletries,household,school,pasabuy',
         ]);
 
@@ -88,6 +153,7 @@ class ProductController extends Controller
             'price' => $request->input('price'),
             'image' => $imagePath,
             'category' => $request->input('category'),
+            'stock' => $request->input('stock'),
         ]);
 
         return redirect()->route('products.create')->with('success', 'Product added successfully!');
@@ -184,7 +250,41 @@ class ProductController extends Controller
         return redirect()->route('admin.products.users')->with('success', 'Admin created successfully..');
     }
 
+    public function checkStock($id)
+    {
+        $product = Product::findOrFail($id);
+        return response()->json([
+            'in_stock' => $product->isInStock(),
+            'stock_count' => $product->stock
+        ]);
+    }
 
+    // Add a method to update stock
+    public function updateStock(Request $request, $id)
+    {
+        $request->validate([
+            'stock' => 'required|integer|min:0'
+        ]);
 
+        $product = Product::findOrFail($id);
+        $product->stock = $request->input('stock');
+        $product->save();
 
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock updated successfully',
+            'new_stock' => $product->stock
+        ]);
+    }
+
+    // Add a method to handle low stock notifications
+    public function getLowStockProducts()
+    {
+        $lowStockThreshold = 5; // You can adjust this value
+        $lowStockProducts = Product::where('stock', '<=', $lowStockThreshold)
+                                  ->where('stock', '>', 0)
+                                  ->get();
+
+        return view('admin.products.low-stock', compact('lowStockProducts'));
+    }
 }

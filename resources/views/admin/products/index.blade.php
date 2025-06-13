@@ -4,10 +4,11 @@
 <div class="max-w-6xl mx-auto px-4 py-6">
     <h1 class="text-3xl font-bold text-yellow-800 mb-6">📦 ALL PRODUCTS - TINDAHAN NI ALING NENA</h1>
     
+    <div class="flex justify-between items-center mb-6">
         <a href="{{ route('products.create') }}" class="inline-block bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow transition">
             ➕ Add New Product
         </a>
-    
+    </div>
 
     @if (session('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4 animate-bounce-in">
@@ -22,6 +23,7 @@
                     <th class="px-6 py-3">📌 Name</th>
                     <th class="px-6 py-3">💸 Price</th>
                     <th class="px-6 py-3">📂 Category</th>
+                    <th class="px-6 py-3">📊 Stock</th>
                     <th class="px-6 py-3 text-center">⚙️ Actions</th>
                 </tr>
             </thead>
@@ -31,31 +33,51 @@
                         <td class="px-6 py-4 font-semibold">{{ $product->name }}</td>
                         <td class="px-6 py-4">₱{{ number_format($product->price, 2) }}</td>
                         <td class="px-6 py-4 capitalize">{{ $product->category }}</td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {{ $product->stock > 10 ? 'bg-green-100 text-green-800' : 
+                                       ($product->stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                    {{ $product->stock }} units
+                                </span>
+                                <span class="ml-2 text-xs">
+                                    @if($product->stock > 10)
+                                        ✓
+                                    @elseif($product->stock > 0)
+                                        ⚠️
+                                    @else
+                                        ❌
+                                    @endif
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center space-x-2">
                             <a href="{{ route('admin.products.edit', $product->id) }}"
-                               class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition">✏️ Edit</a>
+                               class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition">
+                               ✏️ Edit
+                            </a>
+                            
                             <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this item?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit"
-                                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">🗑️ Delete</button>
+                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">
+                                    🗑️ Delete
+                                </button>
                             </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center py-4 text-gray-500">No products found.</td>
+                        <td colspan="5" class="text-center py-4 text-gray-500">No products found.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    
-
     <div class="mt-4">
         {{ $products->links('vendor.pagination.tailwind') }}
     </div>
-    
 </div>
+
 @endsection

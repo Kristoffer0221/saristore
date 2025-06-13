@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('address')->nullable();
-            $table->string('phone')->nullable();
+        Schema::create('page_contents', function (Blueprint $table) {
+            $table->id();
+            $table->string('page_name');
+            $table->string('title');
+            $table->text('content');
+            $table->timestamps();
         });
     }
 
@@ -22,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('page_contents');
     }
 };

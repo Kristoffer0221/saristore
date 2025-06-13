@@ -56,7 +56,7 @@ class AuthenticatedSessionController extends Controller
         session()->put('cart', $cartSession);
     }
     // ✅ REDIRECT BASED ON ROLE
-    return redirect()->intended($user->is_admin ? route('admin.products.index') : route('cart.index'));
+    return redirect()->intended($user->is_admin ? route('admin.products.index') : route('home'));
 }
 
 

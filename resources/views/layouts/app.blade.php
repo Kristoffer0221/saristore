@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tindahan ni Aling Nena</title>
   <script src="https://cdn.tailwindcss.com"></script>
+      <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
   <style>
     body {
@@ -50,6 +51,7 @@
         transition: transform 0.2s ease, opacity 0.2s ease;
     }
   </style>
+  @stack('styles')
 </head>
 <body class="bg-yellow-50 flex flex-col flex-grow">
 
@@ -111,14 +113,55 @@
 
     <div class="flex items-center space-x-3">
       @auth
-        <span class="text-lg text-white font-semibold">👋 Hi, {{ Auth::user()->name }}!</span>
-        <form method="POST" action="{{ route('logout') }}">
-          @csrf
-          <button type="submit" class="bg-white text-orange-500 font-bold px-3 py-1 rounded hover:bg-orange-100">Logout</button>
-        </form>
+        <!-- Profile Dropdown -->
+        <div class="relative group" style="z-index: 999;"> <!-- Increased z-index -->
+            <button class="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl hover:bg-white/20 transition-all duration-200">
+                <div class="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
+                    <span class="text-orange-600 font-bold">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                </div>
+                <span class="text-white font-semibold">{{ Auth::user()->name }}</span>
+                <svg class="w-4 h-4 text-white transform group-hover:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transform group-hover:translate-y-0 translate-y-2 transition-all duration-200"
+                 style="z-index: 999;"> <!-- Increased z-index -->
+                <a href="{{ route('profile.index') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-orange-50">
+                    <svg class="w-5 h-5 mr-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    My Profile
+                </a>
+                
+                <a href="{{ route('orders.index') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-orange-50">
+                    <svg class="w-5 h-5 mr-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    My Orders
+                </a>
+
+                <hr class="my-2 border-gray-100">
+                
+                <form method="POST" action="{{ route('logout') }}" class="block">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50">
+                        <svg class="w-5 h-5 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
       @else
-        <a href="{{ route('login') }}" class="bg-white text-orange-500 font-bold px-3 py-1 rounded hover:bg-orange-100">Login</a>
-        <a href="{{ route('register') }}" class="bg-white text-orange-500 font-bold px-3 py-1 rounded hover:bg-orange-100">Register</a>
+        <a href="{{ route('login') }}" class="bg-white/10 backdrop-blur-sm text-white font-semibold px-4 py-2 rounded-xl hover:bg-white/20 transition-all duration-200">
+            Login
+        </a>
+        <a href="{{ route('register') }}" class="bg-white text-orange-500 font-semibold px-4 py-2 rounded-xl hover:bg-orange-100 transition-all duration-200">
+            Register
+        </a>
       @endauth
     </div>
   </header>
@@ -323,5 +366,6 @@
         this.parentElement.classList.remove('scale-105');
     });
 </script>
+@stack('scripts')
 </body>
 </html>

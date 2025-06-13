@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('category'); // snacks, drinks, etc.
             $table->decimal('price', 8, 2);
             $table->string('image')->nullable(); // image path
+            $table->integer('stock')->default(0)->after('price');
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -64,4 +65,21 @@ class OrderController extends Controller
         return back()->with('success', 'Order updated successfully');
     }
     
+    public function userOrders()
+    {
+        $orders = Auth::user()->orders()
+                     ->latest()
+                     ->paginate(10);
+
+        return view('orders.index', compact('orders'));
+    }
+
+    public function userOrderDetail(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        return view('orders.show', compact('order'));
+    }
 }

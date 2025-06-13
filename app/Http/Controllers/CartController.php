@@ -99,4 +99,57 @@ class CartController extends Controller
         return redirect()->back()->with('success', '🗑️ Item removed from cart.');
     }
 
+    public function buyNow(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        
+        if ($product->stock <= 0) {
+            return back()->with('error', 'Sorry, this product is out of stock.');
+        }
+
+        // Store buy now item in session
+        $buyNowItem = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'quantity' => 1,
+            'image' => $product->image
+        ];
+
+        session()->put('buy_now_item', $buyNowItem);
+
+        return redirect()->route('checkout.index', ['buy_now' => 'true']);
+    }
+
+    public function checkout(Request $request)
+    {
+        $selectedItems = $request->input('selected_items', []);
+        
+        if (empty($selectedItems)) {
+            return back()->with('error', 'Please select items to checkout');
+        }
+
+        $cart = session()->get('cart', []);
+        $checkoutItems = [];
+        $total = 0;
+
+        // Filter only selected items
+        foreach ($cart as $id => $item) {
+            if (in_array((string)$id, $selectedItems)) { // Convert to string for comparison
+                $checkoutItems[$id] = $item;
+                $total += $item['price'] * $item['quantity'];
+            }
+        }
+
+        if (empty($checkoutItems)) {
+            return back()->with('error', 'Selected items not found in cart');
+        }
+
+        // Store selected items and total for checkout
+        session()->put('checkout_items', $checkoutItems);
+        session()->put('checkout_total', $total);
+        session()->put('selected_items', $selectedItems);
+
+        return redirect()->route('checkout.index', ['selected_checkout' => true]);
+    }
 }

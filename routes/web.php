@@ -6,6 +6,9 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\SectionController;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
@@ -30,8 +33,12 @@ Route::get('/household', fn() => app(ProductController::class)->showByCategory('
 Route::get('/school', fn() => app(ProductController::class)->showByCategory('school'))->name('school');
 Route::get('/pasabuy', fn() => app(ProductController::class)->showByCategory('pasabuy'))->name('pasabuy');
 
-// ABOUT PAGE
-Route::view('/about', 'pages.about')->name('about');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+Route::get('/about', [PageController::class, 'about'])->name('about');
+
+
+
 
 // SEARCH PAGE
 Route::get('/search', [ProductController::class, 'search'])->name('search');
@@ -39,7 +46,8 @@ Route::get('/search', [ProductController::class, 'search'])->name('search');
 
 // PROFILE
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile_details', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.editProfile');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
@@ -49,9 +57,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
+    Route::post('/buy-now/{product}', [CartController::class, 'buyNow'])->name('buy.now');
+    Route::post('/checkout/buy-now', [CheckoutController::class, 'processBuyNow'])->name('checkout.buyNow');
 });
 
 // ADMIN PRODUCT MANAGEMENT
+
 Route::middleware(['auth'])->group(function () {
     // Admin Index
     Route::get('/admin/products', [ProductController::class, 'adminIndex'])->name('admin.products.index');
@@ -78,24 +92,53 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
     Route::put('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.status.update');
     
+    Route::get('/products/{id}/check-stock', [ProductController::class, 'checkStock']);
+    Route::post('/products/{id}/update-stock', [ProductController::class, 'updateStock']);
+    Route::get('/products/low-stock', [ProductController::class, 'getLowStockProducts'])->name('products.low-stock');
+
+    // Admin About Page
+    Route::get('/admin/pages/{page}/edit', [PageController::class, 'edit'])->name('admin.pages.edit');
+    Route::put('/admin/pages/{page}', [PageController::class, 'update'])->name('admin.pages.update');
+
+    Route::resource('admin/sections', SectionController::class)->names([
+        'index' => 'admin.sections.index',
+        'create' => 'admin.sections.create',
+        'store' => 'admin.sections.store',
+        'edit' => 'admin.sections.edit',
+        'update' => 'admin.sections.update',
+        'destroy' => 'admin.sections.destroy',
+    ]);
+    
+    Route::post('admin/sections/{section}/order', [SectionController::class, 'updateOrder']);
 });
 
+// PAYPAL ROUTES
 Route::get('/paypal/pay', [PayPalController::class, 'payWithPayPal'])->name('paypal.pay');
 Route::get('/paypal/success', [PayPalController::class, 'success'])->name('paypal.success');
 Route::get('/paypal/cancel', [PayPalController::class, 'cancel'])->name('paypal.cancel');
 
-// SHOW THE CHECKOUT PAGE
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('cart.checkout');
+// CHECKOUT ROUTES
+Route::get('/paypal/return', [CheckoutController::class, 'handlePayPalReturn'])->name('paypal.return');
+Route::get('/paypal/cancel', [CheckoutController::class, 'handlePayPalCancel'])->name('paypal.cancel');
 
-// PLACE ORDER SUBMISSION
-Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
+// SHOW THE CHECKOUT PAGE
+
+
 // PLACE ORDER THANK YOU PAGE
 Route::get('/thankyou', function () {
     return view('thankyou');
 })->name('thankyou');
 
-Route::get('/paypal/return', [CheckoutController::class, 'handlePayPalReturn'])->name('paypal.return');
-Route::get('/paypal/cancel', [CheckoutController::class, 'handlePayPalCancel'])->name('paypal.cancel');
+
+
+
+// Add this in your auth middleware group
+Route::middleware(['auth'])->group(function () {
+    // User Order
+    Route::get('/orders', [OrderController::class, 'userOrders'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'userOrderDetail'])->name('orders.show');
+});
+
 
 
 require __DIR__.'/auth.php';
