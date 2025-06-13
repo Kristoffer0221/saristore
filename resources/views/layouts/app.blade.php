@@ -52,6 +52,8 @@
     }
   </style>
   @stack('styles')
+ 
+<meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-yellow-50 flex flex-col flex-grow">
 

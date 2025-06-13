@@ -62,8 +62,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
     Route::post('/buy-now/{product}', [CartController::class, 'buyNow'])->name('buy.now');
     Route::post('/checkout/buy-now', [CheckoutController::class, 'processBuyNow'])->name('checkout.buyNow');
+    Route::patch('/cart/{id}/quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
 });
-
 // ADMIN PRODUCT MANAGEMENT
 
 Route::middleware(['auth'])->group(function () {

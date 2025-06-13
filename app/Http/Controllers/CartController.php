@@ -152,4 +152,37 @@ class CartController extends Controller
 
         return redirect()->route('checkout.index', ['selected_checkout' => true]);
     }
+
+    public function updateQuantity(Request $request, $id)
+    {
+        try {
+            $quantity = (int) $request->input('quantity');
+            
+            if ($quantity < 1) {
+                return response()->json([
+                    'error' => 'Quantity must be at least 1'
+                ], 400);
+            }
+
+            $cart = session()->get('cart', []);
+            
+            if (!isset($cart[$id])) {
+                return response()->json([
+                    'error' => 'Item not found in cart'
+                ], 404);
+            }
+
+            $cart[$id]['quantity'] = $quantity;
+            session()->put('cart', $cart);
+            
+            return response()->json([
+                'success' => true,
+                'newTotal' => $cart[$id]['price'] * $quantity
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Server error occurred'
+            ], 500);
+        }
+    }
 }

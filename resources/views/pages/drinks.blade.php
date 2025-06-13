@@ -74,10 +74,7 @@
 @endif
 <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- CATEGORY HEADER IMAGE -->
-    <div class="w-full rounded-xl overflow-hidden mb-6">
-    <img src="{{ asset('storage/banners/snacks-banner.webp') }}" alt="Health & Beauty Banner" class="w-full h-[100px] object-fill">
-
-    </div>
+    
 
     <!-- FILTER BAR -->
     <div class="flex flex-wrap justify-between items-center mb-4">
