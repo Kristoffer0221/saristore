@@ -89,15 +89,18 @@
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">💳 Payment Method</h2>
                 <div class="space-y-3">
                     <label class="flex items-center p-4 border rounded-md cursor-pointer hover:bg-gray-50">
-                        <input type="radio" name="payment_method" value="cod" checked class="h-4 w-4 text-orange-600">
+                        <input type="radio" name="payment_method" value="cod" checked class="h-4 w-4 text-orange-600" onchange="togglePaymentMethod(this)">
                         <span class="ml-3 font-medium text-gray-700">Cash on Delivery</span>
                     </label>
                     <label class="flex items-center p-4 border rounded-md cursor-pointer hover:bg-gray-50">
-                        <input type="radio" name="payment_method" value="paypal" class="h-4 w-4 text-orange-600">
+                        <input type="radio" name="payment_method" value="paypal" class="h-4 w-4 text-orange-600" onchange="togglePaymentMethod(this)">
                         <span class="ml-3 font-medium text-gray-700">PayPal</span>
                     </label>
                 </div>
             </div>
+
+            <div id="paypal-button-container" class="hidden mb-6"></div>
+            <p id="result-message"></p>
 
             {{-- ORDER SUMMARY --}}
             <div class="border-t pt-6">
@@ -123,10 +126,12 @@
                 </div>
             </div>
         </form>
+
     @endif
 </div>
 
 @push('scripts')
+<script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.sandbox.client_id') }}&currency=USD"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Flash message auto-dismiss
@@ -139,6 +144,52 @@
             }, 3000);
         }
     });
+
+    function togglePaymentMethod(radio) {
+        const paypalContainer = document.getElementById('paypal-button-container');
+        const regularSubmitButton = document.querySelector('button[type="submit"]');
+        
+        if (radio.value === 'paypal') {
+            paypalContainer.classList.remove('hidden');
+            regularSubmitButton.classList.add('hidden');
+            initPayPalButton();
+        } else {
+            paypalContainer.classList.add('hidden');
+            regularSubmitButton.classList.remove('hidden');
+        }
+    }
+
+    function initPayPalButton() {
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                return fetch('/api/orders', {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        cart: @json($cart) // $cart should be available in your Blade view
+                    })
+                }).then(res => res.json()).then(data => data.id);
+            },
+            onApprove: function(data, actions) {
+                return fetch(`/api/orders/${data.orderID}/capture`, {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                }).then(res => res.json()).then(details => {
+                    if(details.status === 'COMPLETED') {
+                        window.location.href = "{{ route('order.success') }}";
+                    } else {
+                        document.getElementById('result-message').innerText = 'Payment failed.';
+                    }
+                });
+            }
+        }).render('#paypal-button-container');
+    }
 </script>
 @endpush
 @endsection

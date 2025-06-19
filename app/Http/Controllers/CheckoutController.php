@@ -216,4 +216,53 @@ class CheckoutController extends Controller
             return back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }
     }
+
+    public function processPayPalOrder(Request $request)
+    {
+     try {
+        $paypalDetails = json_decode($request->paypal_details, true);
+        $orderDetails = json_decode($request->order_details, true);
+
+        // Validate the payment
+        if (!isset($paypalDetails['status']) || $paypalDetails['status'] !== 'COMPLETED') {
+            throw new \Exception('Payment not completed');
+        }
+
+        // Create the order (without paypal_transaction_id)
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'order_number' => uniqid('ORD-'),
+            'total_amount' => $orderDetails['total'],
+            'payment_method' => 'paypal',
+            'payment_status' => 'paid',
+            'status' => 'Order Placed',
+            'shipping_address' => $orderDetails['shipping_address'] ?? '',
+            'phone' => $orderDetails['phone'] ?? '',
+            // Add other fields as needed
+        ]);
+
+        // Create order items if you have them
+        if (!empty($orderDetails['items'])) {
+            foreach ($orderDetails['items'] as $item) {
+                $order->items()->create([
+                    'product_id' => $item['id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price']
+                ]);
+            }
+        }
+
+        // Clear the cart
+        session()->forget('cart');
+
+        return redirect()->route('thankyou', $order->id)
+            ->with('success', 'Order completed successfully!');
+
+    } catch (\Exception $e) {
+        \Log::error('PayPal Processing Error: ' . $e->getMessage());
+        return redirect()->route('checkout')
+            ->with('error', 'There was an error processing your payment. Please try again.');
+    }
+
+}
 }

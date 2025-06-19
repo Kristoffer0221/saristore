@@ -73,9 +73,7 @@
     </div>
 @endif
 <div class="max-w-7xl mx-auto px-4 py-8">
-    <!-- CATEGORY HEADER IMAGE -->
     
-
     <!-- FILTER BAR -->
     <div class="flex flex-wrap justify-between items-center mb-4">
         <h2 class="text-2xl font-bold text-gray-800">Drinks</h2>

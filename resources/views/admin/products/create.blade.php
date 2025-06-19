@@ -85,7 +85,6 @@
                 <option value="toiletries">Toiletries</option>
                 <option value="household">Household</option>
                 <option value="school">School Supplies</option>
-                <option value="pasabuy">Pasabuy</option>
             </select>
             @error('category')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

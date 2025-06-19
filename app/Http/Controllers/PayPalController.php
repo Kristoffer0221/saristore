@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 
 class PayPalController extends Controller
 {
@@ -67,5 +68,62 @@ class PayPalController extends Controller
     public function cancel()
     {
         return redirect()->route('checkout')->with('error', 'Payment was cancelled.');
+    }
+
+    public function createOrder(Request $request)
+    {
+        $provider = new PayPalClient;
+        $provider->setApiCredentials(config('services.paypal'));
+        $provider->getAccessToken();
+
+        // Calculate total from cart items sent in the request
+        $cart = $request->input('cart', []);
+        $total = 0;
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+
+        $response = $provider->createOrder([
+            "intent" => "CAPTURE",
+            "purchase_units" => [
+                [
+                    "amount" => [
+                        "currency_code" => "USD",
+                        "value" => number_format($total, 2, '.', '')
+                    ]
+                ]
+            ]
+        ]);
+
+        return response()->json($response);
+    }
+
+    public function captureOrder($orderId, Request $request)
+    {
+        $provider = new PayPalClient;
+        $provider->setApiCredentials(config('services.paypal'));
+        $provider->getAccessToken();
+
+        $response = $provider->capturePaymentOrder($orderId);
+
+        if (isset($response['status']) && $response['status'] === 'COMPLETED') {
+            // Save order to DB
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'order_number' => uniqid('ORD-'),
+                'total_amount' => $response['purchase_units'][0]['payments']['captures'][0]['amount']['value'],
+                'payment_method' => 'paypal',
+                'payment_status' => 'paid',
+                'status' => 'Order Placed',
+                'shipping_address' => '', // Fill as needed
+                'phone' => '', // Fill as needed
+            ]);
+            // Optionally, save cart items to order_items table here
+
+            // Clear cart session if needed
+            session()->forget('cart');
+        }
+
+        return response()->json($response);
     }
 }

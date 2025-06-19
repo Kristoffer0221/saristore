@@ -101,7 +101,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:1',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'category' => 'required|string|in:snacks,drinks,canned,noodles,toiletries,household,school,pasabuy',
+            'category' => 'required|string|in:snacks,drinks,canned,noodles,toiletries,household,school',
         ]);
 
         $product->name = $request->input('name');
@@ -143,7 +143,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:1',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'stock' => 'required|integer|min:0',
-            'category' => 'required|string|in:snacks,drinks,canned,noodles,toiletries,household,school,pasabuy',
+            'category' => 'required|string|in:snacks,drinks,canned,noodles,toiletries,household,school',
         ]);
 
         $imagePath = $request->file('image')->store('products', 'public');

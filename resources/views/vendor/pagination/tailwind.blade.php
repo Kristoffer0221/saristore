@@ -1,67 +1,66 @@
+@if ($paginator->hasPages())
+    <nav>
+        <ul class="flex items-center justify-center gap-2">
+            {{-- Previous Page Link --}}
+            @if ($paginator->onFirstPage())
+                <li class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-white border border-gray-300 rounded-md cursor-not-allowed">
+                    <span>&lt;</span>
+                </li>
+            @else
+                <li>
+                    <a href="{{ $paginator->previousPageUrl() }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-orange-50 hover:text-orange-600">
+                        &lt;
+                    </a>
+                </li>
+            @endif
 
-    @if ($paginator->hasPages())
-        <nav>
-            <ul class="flex items-center justify-center gap-2">
-                {{-- Previous Page Link --}}
-                @if ($paginator->onFirstPage())
-                    <li class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-white border border-gray-300 rounded-md cursor-not-allowed" aria-disabled="true">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
+            {{-- Pagination Elements --}}
+            @php
+                $current = $paginator->currentPage();
+                $last = $paginator->lastPage();
+                $start = $current;
+                $elements = 3; // Number of elements to show
+            @endphp
+
+            {{-- Generate the sliding window of page numbers --}}
+            @for ($i = 0; $i < $elements && ($start + $i) <= $last; $i++)
+                @if (($start + $i) == $current)
+                    <li class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-500 border border-blue-500 rounded-md">
+                        {{ $start + $i }}
                     </li>
                 @else
                     <li>
-                        <a href="{{ $paginator->previousPageUrl() }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-orange-50 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
+                        <a href="{{ $paginator->url($start + $i) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-orange-50 hover:text-orange-600">
+                            {{ $start + $i }}
                         </a>
                     </li>
                 @endif
+            @endfor
 
-                {{-- Pagination Elements --}}
-                @foreach ($elements as $element)
-                    {{-- "Three Dots" Separator --}}
-                    @if (is_string($element))
-                        <li class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-white border border-gray-300 rounded-md cursor-default">
-                            {{ $element }}
-                        </li>
-                    @endif
+            {{-- Show dots if not on last pages --}}
+            @if ($current + $elements - 1 < $last)
+                <li class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-white border border-gray-300 rounded-md">
+                    ...
+                </li>
+                <li>
+                    <a href="{{ $paginator->url($last) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-orange-50 hover:text-orange-600">
+                        {{ $last }}
+                    </a>
+                </li>
+            @endif
 
-                    {{-- Array Of Links --}}
-                    @if (is_array($element))
-                        @foreach ($element as $page => $url)
-                            @if ($page == $paginator->currentPage())
-                                <li class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-orange-600 border border-orange-600 rounded-md">
-                                    {{ $page }}
-                                </li>
-                            @else
-                                <li>
-                                    <a href="{{ $url }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-orange-50 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-                                        {{ $page }}
-                                    </a>
-                                </li>
-                            @endif
-                        @endforeach
-                    @endif
-                @endforeach
-
-                {{-- Next Page Link --}}
-                @if ($paginator->hasMorePages())
-                    <li>
-                        <a href="{{ $paginator->nextPageUrl() }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-orange-50 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </li>
-                @else
-                    <li class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-white border border-gray-300 rounded-md cursor-not-allowed">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                        </svg>
-                    </li>
-                @endif
-            </ul>
-        </nav>
-    @endif
+            {{-- Next Page Link --}}
+            @if ($paginator->hasMorePages())
+                <li>
+                    <a href="{{ $paginator->nextPageUrl() }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-orange-50 hover:text-orange-600">
+                        &gt;
+                    </a>
+                </li>
+            @else
+                <li class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-white border border-gray-300 rounded-md cursor-not-allowed">
+                    <span>&gt;</span>
+                </li>
+            @endif
+        </ul>
+    </nav>
+@endif

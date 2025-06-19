@@ -196,9 +196,6 @@
                         <li><a href="{{ route('toiletries') }}" class="block px-4 py-2 hover:bg-orange-100">🧼 Toiletries</a></li>
                         <li><a href="{{ route('household') }}" class="block px-4 py-2 hover:bg-orange-100">🧹 Household</a></li>
                         <li><a href="{{ route('school') }}" class="block px-4 py-2 hover:bg-orange-100">✏️ School Supplies</a></li>
-                        <li><a href="{{ route('pasabuy') }}" class="block px-4 py-2 hover:bg-orange-100">🛍️ Pasabuy</a></li>
-                        <li><a href="{{ route('about') }}" class="block px-4 py-2 hover:bg-orange-100">ℹ️ About Us</a></li>
-                        <li><a href="{{ route('cart.index') }}" class="block px-4 py-2 hover:bg-orange-100">🛒 Cart</a></li>
                     </ul>
                 </li>
                 <li class="nav-item {{ request()->routeIs('products.create') ? 'active' : '' }}">
@@ -245,9 +242,6 @@
                 <li class="nav-item {{ request()->routeIs('school') ? 'active' : '' }}">
                     <a href="{{ route('school') }}">School Supplies</a>
                 </li>
-                <li class="nav-item {{ request()->routeIs('pasabuy') ? 'active' : '' }}">
-                    <a href="{{ route('pasabuy') }}">Pasabuy</a>
-                </li>
                 <li class="nav-item {{ request()->routeIs('about') ? 'active' : '' }}">
                     <a href="{{ route('about') }}">About Us</a>
                 </li>
@@ -291,9 +285,6 @@
             </li>
             <li class="nav-item {{ request()->routeIs('school') ? 'active' : '' }}">
                 <a href="{{ route('school') }}">School Supplies</a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('pasabuy') ? 'active' : '' }}">
-                <a href="{{ route('pasabuy') }}">Pasabuy</a>
             </li>
             <li class="nav-item {{ request()->routeIs('about') ? 'active' : '' }}">
                 <a href="{{ route('about') }}">About Us</a>

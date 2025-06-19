@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -56,7 +55,4 @@ return [
         'locale' => 'en_PH',
         'validate_ssl' => true,
     ],
-
-
-
 ];

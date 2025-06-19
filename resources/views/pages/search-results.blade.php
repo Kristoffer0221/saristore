@@ -35,44 +35,60 @@
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach($products as $product)
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                    <!-- Product Image -->
-                    <div class="relative group">
+                <div class="bg-white rounded-xl shadow-md p-4 flex flex-col items-center">
+                    <div class="w-full h-48 bg-white-100 flex items-center justify-center overflow-hidden rounded-lg mb-4">
                         <img src="{{ asset('storage/' . $product->image) }}"
                              alt="{{ $product->name }}"
-                             class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                        
+                             class="w-full h-full object-contain transition-transform duration-300">
+                    </div>
+                    <h3 class="text-sm font-semibold text-gray-800 truncate mb-1">{{ $product->name }}</h3>
+                    <p class="text-base font-bold text-orange-500 mt-1 mb-2">₱{{ number_format($product->price, 2) }}</p>
+                    
+                    <!-- Stock Status -->
+                    <div class="mb-3 w-full">
+                        @if($product->stock > 10)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                In Stock ({{ $product->stock }})
+                            </span>
+                        @elseif($product->stock > 0)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Low Stock ({{ $product->stock }} left)
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Out of Stock
+                            </span>
+                        @endif
                     </div>
 
-                    <!-- Product Info -->
-                    <div class="p-4">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-2 hover:text-orange-500 transition-colors">
-                            {{ $product->name }}
-                        </h2>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-orange-500 font-bold">₱{{ number_format($product->price, 2) }}</span>
-                            @if($product->stock > 0)
-                                <span class="text-green-500 text-sm">In Stock ({{ $product->stock }})</span>
-                            @else
-                                <span class="text-red-500 text-sm">Out of Stock</span>
-                            @endif
+                    @auth
+                        <div class="mt-3 grid grid-cols-2 gap-2 w-full">
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" 
+                                        class="w-full bg-orange-500 text-white text-sm py-1.5 rounded hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                        {{ $product->stock <= 0 ? 'disabled' : '' }}>
+                                    {{ $product->stock > 0 ? '🛒 Add to Cart' : 'Out of Stock' }}
+                                </button>
+                            </form>
+                            <form action="{{ route('buy.now', $product->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" 
+                                        class="w-full bg-blue-600 text-white text-sm py-1.5 rounded hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                        {{ $product->stock <= 0 ? 'disabled' : '' }}>
+                                    {{ $product->stock > 0 ? '⚡ Buy Now' : 'Out of Stock' }}
+                                </button>
+                            </form>
                         </div>
-
-                        <!-- Add to Cart Form -->
-                        <form method="POST" action="{{ route('cart.add', $product->id) }}" class="mt-4">
-                            @csrf
-                            <button type="submit"
-                                    class="w-full bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600
-                                           transition-colors duration-200 flex items-center justify-center space-x-2
-                                           {{ $product->stock <= 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                    {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                <span>Add to Cart</span>
-                            </button>
-                        </form>
-                    </div>
+                    @else
+                        <div class="mt-3 w-full">
+                            <a href="{{ route('login') }}" 
+                               class="block w-full text-center bg-orange-500 text-white text-sm py-1.5 rounded hover:bg-orange-600 transition">
+                                Login to Purchase
+                            </a>
+                        </div>
+                    @endauth
                 </div>
             @endforeach
         </div>

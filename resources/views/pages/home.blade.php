@@ -10,7 +10,7 @@
             
             <!-- Category Quick Links -->
             <div class="flex flex-wrap justify-center gap-4 mt-8">
-                @foreach(['snacks', 'drinks', 'canned', 'noodles', 'toiletries', 'household', 'school', 'pasabuy'] as $category)
+                @foreach(['snacks', 'drinks', 'canned', 'noodles', 'toiletries', 'household', 'school'] as $category)
                     <a href="{{ route($category) }}" 
                        class="px-4 py-2 bg-white rounded-full shadow-sm hover:shadow-md transition-all transform hover:scale-105
                               text-gray-700 hover:text-orange-600 capitalize">
@@ -36,7 +36,7 @@
                         <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
                         <select name="category" id="category" class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
                             <option value="">All Categories</option>
-                            @foreach(['snacks', 'drinks', 'canned', 'noodles', 'toiletries', 'household', 'school', 'pasabuy'] as $cat)
+                            @foreach(['snacks', 'drinks', 'canned', 'noodles', 'toiletries', 'household', 'school'] as $cat)
                                 <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>
                                     {{ ucfirst($cat) }}
                                 </option>
