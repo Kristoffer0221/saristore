@@ -10,12 +10,7 @@
             </h1>
         </div>
         <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
-            <button onclick="openAddModalUser(0)" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
-                Add User
-            </button>
+            
             <button onclick="openAddModalAdmin(1)" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                 <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -130,9 +125,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end space-x-2">
-                                    <button onclick="openModal({{ $user->id }}, '{{ $user->name }}', '{{ $user->email }}' , '{{ $user->address }}' , '{{ $user->phone }}' , '{{ $user->is_admin  }}' )" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                                        ✏️ Edit
-                                    </button>
+                                    
                                     <form action="{{ route('admin.products.delete', $user->id) }}" method="POST" onsubmit="return confirm('Delete this user?');">
                                         @csrf
                                         @method('DELETE')
@@ -212,67 +205,7 @@
     </div>
 </div>
 
-<!-- ADD MODAL USER -->
-<div id="addModalUser" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 transition-opacity duration-300">
-    <div class="bg-white rounded-2xl w-full max-w-md p-8 relative transform transition-all scale-95 opacity-0 shadow-xl" id="addModalUserContent">
-        <div class="absolute top-0 right-0 pt-4 pr-4">
-            <button onclick="closeAddModal()" class="bg-white rounded-full p-2 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">
-                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-        <div class="text-center mb-8">
-            <h2 class="text-2xl font-bold text-green-600">Add User Account</h2>
-            <p class="mt-2 text-sm text-gray-500">Fill in the information below to create a new user account</p>
-        </div>
-        <form action="{{ route('admin.user.add') }}" method="POST" class="space-y-4">
-            @csrf
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Name</label>
-                <input type="text" name="name" 
-                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors" 
-                       required>
-            </div>
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="email" 
-                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors" 
-                       required>
-            </div>
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" name="password" 
-                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors" 
-                       required>
-            </div>
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Address</label>
-                <input type="text" name="address" 
-                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors" 
-                       required>
-            </div>
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Phone No.</label>
-                <input type="text" name="phone" 
-                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors" 
-                       required>
-            </div>
-            <input type="hidden" name="is_admin" value="0">
 
-            <div class="flex justify-end gap-3 mt-6">
-                <button type="button" onclick="closeAddModal()" 
-                        class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                    Cancel
-                </button>
-                <button type="submit" 
-                        class="px-4 py-2 bg-green-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                    Add User
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- ADD MODAL ADMIN -->
 <div id="addModalAdmin" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 transition-opacity duration-300">
